@@ -1,0 +1,10 @@
+version: '3.7'
+services:
+  model_api:
+    container_name: lung_model_api
+    build: .
+    ports:
+      - "8011:8011"
+#    volumes:
+#      - ./app/endpoints/segmentation.py:/app/app/endpoints/segmentation.py
+#      - ./app/main.py:/app/app/main.py
