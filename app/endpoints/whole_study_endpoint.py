@@ -33,11 +33,13 @@ async def predict(items: List[str]):
 
     series_metadata = [
         {
-            "metadata": {
-                "dataType": "text",
-                "value": f"Instances in series: {len(series_dict[uid])}",
-                "title": "Series metadata",
-            }
+            "metadata": [
+                {
+                    "dataType": "text",
+                    "value": f"Instances in series: {len(series_dict[uid])}",
+                    "title": "Series metadata",
+                }
+            ]
         }
         for uid in series_dict.keys()
     ]
@@ -45,13 +47,13 @@ async def predict(items: List[str]):
     study_metadata = [
         {
             "dataType": "text",
-            "value": f"{len(instances)} instances in series",
-            "title": "Series metadata",
+            "value": f"{len(series_uids)} series in the study",
+            "title": "Study metadata",
             "description": "Here you may put the description of the metadata for a study",
         }
     ]
 
-    return get_instances_for_each_series(
+    return generate_json_response(
         study_instance_uid, series_uids, study_metadata, series_metadata
     )
 
@@ -76,12 +78,12 @@ def generate_json_response(
 def get_instances_for_each_series(
     instances: List[FileDataset],
 ) -> Dict["str", List[FileDataset]]:
-    series_uids = set([i.StudyInstanceUID for i in instances])
+    series_uids = set([i.SeriesInstanceUID for i in instances])
 
     series_dict = {}
     for s_uid in series_uids:
         series_dict[s_uid] = list(
-            filter(lambda i: i.StudyInstanceUID == s_uid, instances)
+            filter(lambda i: i.SeriesInstanceUID == s_uid, instances)
         )
 
     for s_uid in series_uids:
