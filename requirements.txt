@@ -1,5 +1,4 @@
-dicomweb-client==0.53.0
-nibabel==3.2.1
-monai==0.7.0
-python-multipart==0.0.5 
+numpy==1.22.2
+pydicom==2.2.2
+python-multipart==0.0.5
 orjson==3.6.5
