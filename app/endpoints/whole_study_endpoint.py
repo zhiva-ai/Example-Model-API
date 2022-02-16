@@ -24,7 +24,7 @@ async def predict(items: List[str]):
         pydicom.dcmread(io.BytesIO(bytes(json.loads(instance)))) for instance in items
     ]
 
-    study_instance_uid = str(instances[0].StudyInstanceUID)
+    study_uid = str(instances[0].StudyInstanceUID)
 
     series_dict = get_instances_for_each_series(instances)
     series_uids = list(map(lambda uid: str(uid), series_dict.keys()))
@@ -54,7 +54,7 @@ async def predict(items: List[str]):
     ]
 
     return generate_json_response(
-        study_instance_uid, series_uids, study_metadata, series_metadata
+        study_uid, series_uids, study_metadata, series_metadata
     )
 
 
