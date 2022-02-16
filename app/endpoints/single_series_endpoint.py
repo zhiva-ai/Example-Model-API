@@ -5,10 +5,9 @@ from app.docker_logs import get_logger
 from typing import List, Dict, Any
 import io
 import pydicom
-from pydicom.dataset import FileDataset
 import json
 import numpy as np
-from app.endpoints.utils import get_square_mask
+from app.endpoints.utils import mock_up_inference
 
 router = APIRouter(prefix="/single-series-endpoint")
 
@@ -27,13 +26,12 @@ async def predict(items: List[str]):
 
     instances.sort(key=lambda i: i.InstanceNumber)
     logger.info(f"{len(instances)} instances in series")
-    study_instance_uid = str(instances[0].StudyInstanceUID)
-    series_instance_uid = str(instances[0].SeriesInstanceUID)
+    study_uid = str(instances[0].StudyInstanceUID)
+    series_uid = str(instances[0].SeriesInstanceUID)
 
     instances_uids = [str(i.SOPInstanceUID) for i in instances]
-    # mapping = {str(i.InstanceNumber): str(i.SOPInstanceUID) for i in instances}
 
-    masks = inference(instances)
+    masks = mock_up_inference(instances)
 
     series_metadata = [
         {
@@ -50,8 +48,8 @@ async def predict(items: List[str]):
     ]
 
     return generate_json_response(
-        study_instance_uid,
-        series_instance_uid,
+        study_uid,
+        series_uid,
         instances_uids,
         masks,
         series_metadata,
@@ -59,24 +57,9 @@ async def predict(items: List[str]):
     )
 
 
-def inference(instances: List[FileDataset]) -> np.ndarray:
-    """
-    A function that acts as a model inference mock-up. For each frame we assign a square mask
-    :param instances:
-    :return: mask of squares for each frame of shape (frames, w, h)
-    """
-    w, h = instances[0].pixel_array.shape
-    radius = w // 5
-    center_coordinates = (w // 2, h // 2)
-
-    return np.stack(
-        [get_square_mask(w, h, center_coordinates, radius) for _ in instances], axis=0
-    )
-
-
 def generate_json_response(
-    study_instance_uid: str,
-    series_instance_uid: str,
+    study_uid: str,
+    series_uid: str,
     instances_uids: List[str],
     masks: np.ndarray,
     series_metadata: List[Dict[str, Any]],
@@ -105,8 +88,8 @@ def generate_json_response(
     instances_dict["metadata"] = series_metadata
 
     study_dict = {
-        study_instance_uid: {
-            series_instance_uid: instances_dict,
+        study_uid: {
+            series_uid: instances_dict,
         }
     }
     return orjson.dumps(study_dict)
