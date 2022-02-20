@@ -129,16 +129,16 @@ def generate_json_response(
 
     series_one_instances_dict["metadata"] = series_one_metadata
 
-    # for idx, i_uid in enumerate(series_two_instances_uids):
-    #     single_mask = {
-    #         "points": series_two_masks[idx].tolist(),
-    #         "color": series_two_color,
-    #         "classColor": series_two_class_color,
-    #         "activeColor": series_two_active_color,
-    #         "className": series_two_class_name,
-    #     }
-    #     segments = [single_mask]
-    #     series_two_instances_dict[i_uid] = {"segments": segments}
+    for idx, i_uid in enumerate(series_two_instances_uids):
+        single_mask = {
+            "points": series_two_masks[idx].tolist(),
+            "color": series_two_color,
+            "classColor": series_two_class_color,
+            "activeColor": series_two_active_color,
+            "className": series_two_class_name,
+        }
+        segments = [single_mask]
+        series_two_instances_dict[i_uid] = {"segments": segments}
 
     series_two_instances_dict["metadata"] = series_two_metadata
 
