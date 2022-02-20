@@ -11,7 +11,7 @@ We show some example annotation types such as:
 
 We provide a separate endpoint for each approach. From there, you can easily start deploying the model. To learn more about the API structure, see [documentation](https://docs.zhiva.ai/latest)
 
-Each endpoint must be configured in the `models.json` file in [model-proxy](https://github.com/zhiva-ai/model-proxy-example) and added manually to the viewer. To learn more see the [Model Configuration]() section of this Readme. 
+Each endpoint must be configured in the `models.json` file in [model-proxy](https://github.com/zhiva-ai/model-proxy-example) and added manually to the viewer. To learn more see the [Model Configuration](#Model-configuration) section of this Readme. 
 
 
 # How to run the API 
@@ -27,10 +27,13 @@ API avalible at:
 ```
 
 # Model configuration
-Follow the official [tutorial](https://docs.zhiva.ai/latest). You need to configure a proxy server that will route requests 
-from the [viewer](https://alpha.zhiva.ai/login) to the model API.
+Follow the official [tutorial](https://docs.zhiva.ai/latest/managing-ai-models-inside-the-dicom-viewer). 
+You need to configure a proxy server that will route requests from the [viewer](https://alpha.zhiva.ai/login) to the model API.
 
-You will need to add the endpoint to `models.json` file in [model-proxy](https://github.com/zhiva-ai/model-proxy-example)
+You will need to add each endpoint to `models.json` config file in [model-proxy](https://github.com/zhiva-ai/model-proxy-example)
+
+Below is the configuration for both the viewer and the `model-proxy`. We assume that the API runs on `localhost:8011`
+and is available on the same network as the `model-proxy`. This is the case if you follow the official documentation.
 
 ### Segmentation and prediction for a single series
 
