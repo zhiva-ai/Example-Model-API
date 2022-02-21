@@ -1,46 +1,69 @@
 import numpy as np
-from typing import Dict, Any
-from app.docker_logs import get_logger
-import orjson
-
-logger = get_logger("serialization-logger")
+from typing import List
+from pydicom import FileDataset
 
 
-def convert_lungs_prediction_to_json_response(
-    study_instance_uid: str,
-    series_instance_uid: str,
-    mapping: dict,
-    masks: np.ndarray,
-    series_metadata: Dict[str, Any],
-    class_name="Lung",
-    description="Lung",
-    color="lightskyblue",
-    class_color="lightskyblue",
-    active_color="aquamarine",
-) -> bytes:
-    rois_in_series = {}
+def get_square_mask(w, h, center_coordinates, radius, color=1):
+    mask = np.zeros((w, h), dtype=np.uint8)
+    x_start, x_end = center_coordinates[0] - radius, center_coordinates[0] + radius
+    y_start, y_end = center_coordinates[1] - radius, center_coordinates[1] + radius
 
-    for i in range(masks.shape[0]):
-        single_mask = {
-            "points": masks[i].tolist(),
-            "color": color,
-            "classColor": class_color,
-            "activeColor": active_color,
-            "className": class_name,
-            "description": description,
-        }
+    mask[x_start:x_end, y_start:y_end] = color
 
-        segments = [single_mask]
+    return mask
 
-        frame_number = str(i + 1)
 
-        rois_in_series[mapping[frame_number]] = {"segments": segments}
+def get_square_annotation_list(w, h, center_coordinates, radius):
+    color = 1
 
-    rois_in_series["metadata"] = [series_metadata]
+    mask = np.zeros((w, h), dtype=np.uint8)
+    x_start, x_end = center_coordinates[0] - radius, center_coordinates[0] + radius
+    y_start, y_end = center_coordinates[1] - radius, center_coordinates[1] + radius
 
-    final_dict = {
-        study_instance_uid: {
-            series_instance_uid: rois_in_series,
-        }
-    }
-    return orjson.dumps(final_dict)
+    # print("x_start:", x_start, "x_end:", x_end, "y_start:", y_start, "y_end:", y_end)
+
+    mask[x_start : (x_end + 1), y_start] = color
+    mask[x_start : (x_end + 1), y_end] = color
+
+    mask[x_start, y_start : (y_end + 1)] = color
+    mask[x_end, y_start : (y_end + 1)] = color
+
+    return [[x_start, y_start], [x_end, y_start], [x_end, y_start], [x_end, y_end], [x_start, y_start]]
+
+    # return np.argwhere(mask == color).tolist()
+
+
+def mock_up_inference_annotation(
+    instances: List[FileDataset], radius_factor: float = 0.2
+):
+    """
+    A function that acts as a model inference mock-up. For each frame we assign a square mask
+    :param radius_factor:
+    :param instances:
+    :return:
+    """
+    w, h = instances[0].pixel_array.shape
+    radius = int((w + h) / 2 * radius_factor)
+    center_coordinates = (w // 2, h // 2)
+
+    return [
+        get_square_annotation_list(w, h, center_coordinates, radius) for _ in instances
+    ]
+
+
+def mock_up_inference(
+    instances: List[FileDataset], radius_factor: float = 0.2
+) -> np.ndarray:
+    """
+    A function that acts as a model inference mock-up. For each frame we assign a square mask
+    :param radius_factor:
+    :param instances:
+    :return: mask of squares for each frame of shape (frames, w, h)
+    """
+    w, h = instances[0].pixel_array.shape
+    radius = int((w + h) / 2 * radius_factor)
+    center_coordinates = (w // 2, h // 2)
+
+    return np.stack(
+        [get_square_mask(w, h, center_coordinates, radius) for _ in instances], axis=0
+    )
