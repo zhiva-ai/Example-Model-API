@@ -3,7 +3,7 @@ In this repository we show how to design an API with an AI model and how to make
 
 <img src="assets/example-visualisation.webp" width="700px"/>
 
-We show some example annotation types such as: 
+We show some example model prediction types such as: 
 
 - segmentation and prediction for a single series
 - prediction for an entire study (multiple series) 
