@@ -1,7 +1,7 @@
 # Example-Model-API
 In this repository we show how to design an API with an AI model and how to make it connected with the viewer. We return dummy annotations that should be taken as a starting point to plug in your own valid AI models and integrate seamlessly with the zhiva viewer.
 
-<img src="assets/example-visualisation.webm" width="700px"/>
+<img src="assets/example-visualisation.webp" width="700px"/>
 
 We show some example annotation types such as: 
 
