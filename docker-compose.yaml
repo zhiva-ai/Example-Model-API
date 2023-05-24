@@ -8,3 +8,8 @@ services:
 #    volumes:
 #      - ./app/endpoints/segmentation.py:/app/app/endpoints/segmentation.py
 #      - ./app/main.py:/app/app/main.py
+    networks:
+      - model-network
+networks:
+  model-network:
+    name: model-shared-network
